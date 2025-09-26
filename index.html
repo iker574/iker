@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💧 Proyecto Pluviómetros Ciudadanos</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2.5rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)), url('https://placehold.co/1920x600/2c3e50/ffffff?text=Cielo+Lluvioso') center/cover no-repeat;
+            filter: blur(5px);
+            z-index: 1;
+        }
+        header h1, header p {
+            position: relative;
+            z-index: 2;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        header p {
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+        main {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        section {
+            background-color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            color: #34495e;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 0.5rem;
+        }
+        /* Estilos del Formulario */
+        #formulario-lluvia {
+            display: grid;
+            gap: 1.2rem;
+        }
+        #formulario-lluvia label {
+            font-weight: bold;
+            color: #555;
+        }
+        #formulario-lluvia input[type="date"],
+        #formulario-lluvia input[type="text"],
+        #formulario-lluvia input[type="number"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        #formulario-lluvia input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        #formulario-lluvia button {
+            background-color: #3498db;
+            color: white;
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #formulario-lluvia button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        #mensaje-envio {
+            display: none;
+            padding: 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+        /* Estilos de la Tabla */
+        #tabla-datos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+        #tabla-datos th, #tabla-datos td {
+            border: 1px solid #e0e0e0;
+            padding: 1rem;
+            text-align: left;
+        }
+        #tabla-datos th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        #tabla-datos tbody tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        /* Adaptación móvil */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            main {
+                margin: 1rem auto;
+            }
+            section {
+                padding: 1.5rem;
+            }
+            #tabla-datos, #tabla-datos thead, #tabla-datos tbody, #tabla-datos th, #tabla-datos td, #tabla-datos tr {
+                display: block;
+            }
+            #tabla-datos thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            #tabla-datos tr {
+                border: 1px solid #ccc;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            #tabla-datos td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+            #tabla-datos td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-left: 1rem;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>💧 Pluviómetros Ciudadanos</h1>
+        <p>Tu contribución ayuda a comprender mejor el ciclo hídrico y a proteger tu comunidad.</p>
+    </header>
+
+    <main>
+        <section id="informacion">
+            <h2>¿Por qué medir la Lluvia?</h2>
+            <p>La precipitación es un factor clave en el clima y la ecología de nuestro planeta. Medir la lluvia en tu localidad nos permite obtener datos más precisos y detallados sobre su distribución, algo que las estaciones meteorológicas oficiales a menudo no pueden capturar completamente. Con tu ayuda, podemos entender mejor los patrones de lluvia, predecir inundaciones y sequías, y tomar mejores decisiones para la gestión del agua. **¡Cada gota de información cuenta!**</p>
+        </section>
+
+        <section id="instrucciones">
+            <h2>🛠️ Construye tu Pluviómetro Casero</h2>
+            <p>No necesitas equipo costoso. Puedes crear un pluviómetro sencillo y efectivo con materiales comunes. Lo más importante es que uses un recipiente con paredes rectas (como una botella de plástico) y que lo calibres correctamente. Calibrar significa marcar la altura en milímetros para cada cierta cantidad de agua. Colócalo en un lugar abierto, lejos de árboles o edificios que puedan interferir.
+            </p>
+            <p>
+            
+            </p>
+            <p>Recuerda vaciarlo después de cada medición para que tus datos sean precisos. Por ejemplo, si llueve a las 20:00, vacíalo a esa hora del día siguiente para medir la lluvia total de las últimas 24 horas.</p>
+        </section>
+
+        <section id="reporte">
+            <h2>📝 Reporta tu Medición</h2>
+            <form id="formulario-lluvia">
+                <label for="fecha">Fecha de Medición:</label>
+                <input type="date" id="fecha" name="fecha" required>
+
+                <label for="localizacion">Tu Localización (ej. Código Postal, barrio o coordenadas):</label>
+                <input type="text" id="localizacion" name="localizacion" required placeholder="Ej: CP 28001 o Lat/Lon">
+
+                <label for="milimetros">Lluvia Registrada (en mm):</label>
+                <input type="number" id="milimetros" name="milimetros" min="0" step="0.1" required placeholder="Ej: 15.5">
+                
+                <label for="nombre-opcional">Nombre (Opcional, para el ranking):</label>
+                <input type="text" id="nombre-opcional" name="nombre-opcional" placeholder="Tu apodo o iniciales">
+
+                <button type="submit">Enviar Dato</button>
+                <p id="mensaje-envio"></p>
+            </form>
+        </section>
+
+        <section id="datos-recopilados">
+            <h2>📊 Datos Recopilados Recientemente</h2>
+            <table id="tabla-datos">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Localización</th>
+                        <th>Lluvia (mm)</th>
+                        <th>Participante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los datos se insertarán aquí con JavaScript -->
+                </tbody>
+            </table>
+            <p class="nota">*(Nota: Esta tabla es un ejemplo para demostrar la funcionalidad. En un proyecto real, los datos se almacenarían en una base de datos.)*</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            <a href="#" style="color: #666; text-decoration: none;">Acerca de nosotros</a> | 
+            <a href="#" style="color: #666; text-decoration: none;">Contacto</a>
+        </p>
+        <p>
+            &copy; 2025 Proyecto de Ciencia Ciudadana.
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('formulario-lluvia');
+            const tablaBody = document.querySelector('#tabla-datos tbody');
+            const mensajeEnvio = document.getElementById('mensaje-envio');
+
+            // Cargar datos al iniciar
+            const cargarDatos = () => {
+                const datosGuardados = JSON.parse(localStorage.getItem('datosLluvia')) || [];
+                datosGuardados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                renderizarTabla(datosGuardados);
+            };
+
+            // Renderizar la tabla con los datos
+            const renderizarTabla = (datos) => {
+                tablaBody.innerHTML = ''; // Limpiar la tabla
+                datos.slice(0, 10).forEach(dato => {
+                    const fila = tablaBody.insertRow();
+                    fila.insertCell().textContent = dato.fecha;
+                    fila.insertCell().textContent = dato.localizacion;
+                    fila.insertCell().textContent = `${dato.milimetros} mm`;
+                    fila.insertCell().textContent = dato.participante || 'Anónimo';
+                });
+            };
+
+            // Manejar el envío del formulario
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const nuevoDato = {
+                    fecha: document.getElementById('fecha').value,
+                    localizacion: document.getElementById('localizacion').value.trim(),
+                    milimetros: parseFloat(document.getElementById('milimetros').value),
+                    participante: document.getElementById('nombre-opcional').value.trim()
+                };
+
+                // Validar los datos
+                if (isNaN(nuevoDato.milimetros) || nuevoDato.milimetros < 0) {
+                    mensajeEnvio.textContent = '❌ Por favor, ingresa un valor de lluvia válido (ej: 12.5).';
+                    mensajeEnvio.style.color = '#c0392b';
+                    mensajeEnvio.style.display = 'block';
+                    return;
+                }
+
+                // Obtener datos existentes, agregar el nuevo y guardar
+                const datosActualizados = JSON.parse(localStorage.getItem('datosLluvia')) || [];
+                datosActualizados.push(nuevoDato);
+                localStorage.setItem('datosLluvia', JSON.stringify(datosActualizados));
+
+                // Mostrar mensaje de éxito y limpiar el formulario
+                mensajeEnvio.textContent = '✅ ¡Gracias! Tu dato ha sido registrado con éxito.';
+                mensajeEnvio.style.color = '#27ae60';
+                mensajeEnvio.style.display = 'block';
+
+                document.getElementById('milimetros').value = '';
+                document.getElementById('nombre-opcional').value = '';
+                document.getElementById('fecha').value = '';
+                document.getElementById('localizacion').value = '';
+                
+                // Actualizar la tabla
+                cargarDatos();
+
+                // Ocultar el mensaje después de 3 segundos
+                setTimeout(() => {
+                    mensajeEnvio.style.display = 'none';
+                }, 3000);
+            });
+
+            // Cargar los datos al iniciar la página
+            cargarDatos();
+        });
+    </script>
+</body>
+</html>
